@@ -1,196 +1,195 @@
-# Polyseek アップグレードプラン
+# Polyseek Upgrade Plan
 
-## 🎯 優先度別アップグレード項目
+## Current Status
 
-### 🔥 高優先度（即座に価値を提供）
+✅ **Implemented:**
+- News API integration (working)
+- X/Twitter API integration (implemented, requires token)
+- RSS feed integration (implemented, fallback)
+- Polymarket API (public, no auth required)
+- Comment scraping (implemented)
+- Deep mode (4-step analysis: Planner → Critic → Follow-up → Final)
 
-#### 1. X/Twitter統合
-- **現状**: News APIのみ
-- **改善**: X API v2を使用してリアルタイムのソーシャルシグナルを取得
-- **実装**: `signals_client.py`に`TwitterSignalProvider`を追加
-- **価値**: よりリアルタイムな市場センチメントの把握
+## Priority-Based Upgrade Items
 
-#### 2. Reddit統合
-- **現状**: 未実装
-- **改善**: Reddit APIを使用して関連スレッドとコメントを取得
-- **実装**: `signals_client.py`に`RedditSignalProvider`を追加
-- **価値**: コミュニティの議論とセンチメントの分析
+### 🔥 High Priority (Immediate Value)
 
-#### 3. コメント分析の強化
-- **現状**: 基本的なスクレイピングのみ
-- **改善**: 
-  - 言語判定と翻訳（`langdetect`, `deep-translator`）
-  - スパム/毒性フィルタリング
-  - 感情分析の改善
-- **実装**: `scrape_context.py`を拡張
-- **価値**: より正確なコメント分析
+#### 1. Reddit Integration
+- **Status**: Not implemented
+- **Improvement**: Use Reddit API to fetch relevant threads and comments
+- **Implementation**: Add `RedditSignalProvider` to `signals_client.py`
+- **Value**: Community discussion and sentiment analysis
+- **Quick Start**:
+  ```bash
+  pip install praw
+  export REDDIT_CLIENT_ID="your-id"
+  export REDDIT_CLIENT_SECRET="your-secret"
+  ```
 
-#### 4. Deepモードの実装
-- **現状**: Quickモードのみ実装済み
-- **改善**: Planner→Critic→Follow-up→Finalの4ステップ分析
-- **実装**: `analysis_agent.py`を拡張
-- **価値**: より深い分析と精度向上
+#### 2. Enhanced Comment Analysis
+- **Status**: Basic scraping only
+- **Improvement**: 
+  - Language detection and translation (`langdetect`, `deep-translator`)
+  - Spam/toxicity filtering
+  - Improved sentiment analysis
+- **Implementation**: Extend `scrape_context.py`
+- **Value**: More accurate comment analysis
+- **Quick Start**:
+  ```bash
+  pip install langdetect deep-translator
+  ```
 
-#### 5. キャッシュ機能
-- **現状**: キャッシュなし
-- **改善**: 
-  - マーケットデータのキャッシュ（ETag対応）
-  - ニュース検索結果のキャッシュ
-  - Redisまたはメモリキャッシュ
-- **実装**: 新しい`cache.py`モジュール
-- **価値**: パフォーマンス向上とAPIコスト削減
+#### 3. Caching Layer
+- **Status**: No caching
+- **Improvement**: 
+  - Market data caching (ETag support)
+  - News search result caching
+  - Redis or in-memory cache
+- **Implementation**: New `cache.py` module
+- **Value**: Performance improvement and API cost reduction
+- **Quick Start**:
+  ```bash
+  pip install cachetools
+  # or for Redis
+  pip install redis
+  ```
 
-### ⚡ 中優先度（機能性向上）
+### ⚡ Medium Priority (Functionality Improvements)
 
-#### 6. メトリクスとログ
-- **現状**: 基本的なログのみ
-- **改善**:
-  - 処理時間の計測
-  - API呼び出し回数と成功率
-  - LLMトークン使用量の追跡
-  - エラー率の監視
-- **実装**: `metrics.py`モジュールを追加
-- **価値**: 運用監視と最適化
+#### 4. Enhanced Error Handling
+- **Status**: Basic error handling
+- **Improvement**:
+  - Automatic retry with exponential backoff
+  - Circuit breakers
+  - Fallback mechanisms
+  - User-friendly error messages
+- **Implementation**: New `error_handler.py` module
+- **Value**: Improved reliability and user experience
 
-#### 7. エラーハンドリングの強化
-- **現状**: 基本的なエラーハンドリング
-- **改善**:
-  - 自動リトライ（指数バックオフ）
-  - サーキットブレーカー
-  - フォールバック機能
-  - ユーザーフレンドリーなエラーメッセージ
-- **実装**: `error_handler.py`モジュールを追加
-- **価値**: 信頼性とユーザー体験の向上
+#### 5. Metrics & Logging
+- **Status**: Basic logging only
+- **Improvement**:
+  - Processing time tracking
+  - API call success rates
+  - LLM token usage monitoring
+  - Error rate tracking
+- **Implementation**: New `metrics.py` module
+- **Value**: Better observability and optimization
 
-#### 8. 信頼度スコアリングの改善
-- **現状**: 基本的な信頼度計算
-- **改善**:
-  - ソースの信頼度スコア
-  - 時系列による重み付け
-  - ベイズ更新の改善
-- **実装**: `analysis_agent.py`を拡張
-- **価値**: より正確な信頼度評価
+#### 6. Improved Confidence Scoring
+- **Status**: Basic confidence calculation
+- **Improvement**:
+  - Source credibility scoring
+  - Time-series weighting
+  - Enhanced Bayesian updates
+- **Implementation**: Extend `analysis_agent.py`
+- **Value**: More accurate confidence assessments
 
-#### 9. 並列処理の最適化
-- **現状**: 基本的な並列処理
-- **改善**:
-  - より効率的な並列実行
-  - タイムアウト管理の改善
-  - リソース使用量の最適化
-- **実装**: `main.py`を改善
-- **価値**: パフォーマンス向上
+### 🚀 Low Priority (Future Extensions)
 
-### 🚀 低優先度（将来の拡張）
+#### 7. REST API Endpoints
+- **Status**: CLI only
+- **Improvement**: FastAPI-based REST API
+- **Implementation**: New `api.py` module
+- **Value**: Integration with other applications
 
-#### 10. REST APIエンドポイント
-- **現状**: CLIのみ
-- **改善**: FastAPIを使用したREST API
-- **実装**: `api.py`モジュールを追加
-- **価値**: 他のアプリケーションからの利用
+#### 8. WebSocket Streaming
+- **Status**: Batch response
+- **Improvement**: Real-time analysis progress streaming
+- **Implementation**: WebSocket support
+- **Value**: Better user experience
 
-#### 11. WebSocketストリーミング
-- **現状**: 一括レスポンス
-- **改善**: リアルタイムの分析進捗をストリーミング
-- **実装**: WebSocket対応
-- **価値**: ユーザー体験の向上
+#### 9. Historical Market Comparison
+- **Status**: Single market analysis only
+- **Improvement**: Compare similar markets
+- **Implementation**: Database and comparison logic
+- **Value**: More contextual analysis
 
-#### 12. 過去マーケットとの比較
-- **現状**: 単一マーケット分析のみ
-- **改善**: 類似マーケットとの比較分析
-- **実装**: データベースと比較ロジック
-- **価値**: より文脈のある分析
+#### 10. Database Persistence
+- **Status**: Temporary analysis only
+- **Improvement**: Persist analysis results
+- **Implementation**: SQLite or PostgreSQL
+- **Value**: History tracking and learning
 
-#### 13. データベース保存
-- **現状**: 一時的な分析のみ
-- **改善**: 分析結果の永続化
-- **実装**: SQLiteまたはPostgreSQL
-- **価値**: 履歴追跡と学習
+#### 11. Web UI
+- **Status**: CLI only
+- **Improvement**: Gradio or Streamlit web interface
+- **Implementation**: New `web_ui.py` module
+- **Value**: Easier access for non-technical users
 
-#### 14. Web UI
-- **現状**: CLIのみ
-- **改善**: GradioまたはStreamlitを使用したWebインターフェース
-- **実装**: `web_ui.py`モジュール
-- **価値**: より使いやすいインターフェース
+## Implementation Roadmap
 
-## 📋 実装ロードマップ
+### Phase 1: Core Enhancements (1-2 weeks)
+1. Reddit integration
+2. Enhanced comment analysis
+3. Caching layer
 
-### Phase 1: コア機能強化（1-2週間）
-1. X/Twitter統合
-2. Reddit統合
-3. コメント分析の強化
-4. キャッシュ機能
+### Phase 2: Quality Improvements (1-2 weeks)
+4. Enhanced error handling
+5. Metrics & logging
+6. Improved confidence scoring
 
-### Phase 2: 分析品質向上（1-2週間）
-5. Deepモードの実装
-6. 信頼度スコアリングの改善
-7. エラーハンドリングの強化
+### Phase 3: Platform Expansion (Future)
+7-11. REST API, WebSocket, Database, Web UI
 
-### Phase 3: 運用改善（1週間）
-8. メトリクスとログ
-9. 並列処理の最適化
+## Quick Implementation Examples
 
-### Phase 4: 拡張機能（将来）
-10-14. REST API、WebSocket、データベース、Web UI
+### Reddit Integration
 
-## 🛠️ 実装例
-
-### X/Twitter統合の実装例
+Add to `signals_client.py`:
 
 ```python
-# signals_client.py に追加
-class TwitterSignalProvider:
-    def __init__(self, bearer_token: Optional[str]):
-        self.bearer_token = bearer_token
-        self.api_base = "https://api.twitter.com/2"
+class RedditSignalProvider:
+    def __init__(self, client_id: Optional[str], client_secret: Optional[str], 
+                 user_agent: Optional[str], max_results: int = 10):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.user_agent = user_agent
+        self.max_results = max_results
     
     @property
     def available(self) -> bool:
-        return bool(self.bearer_token)
+        return bool(self.client_id and self.client_secret)
     
     async def search(self, query: str) -> List[SignalRecord]:
         if not self.available:
             return []
-        
-        # Twitter API v2を使用
-        # 実装...
+        # Reddit API implementation
+        # ...
 ```
 
-### Deepモードの実装例
+### Enhanced Comment Analysis
+
+Add to `scrape_context.py`:
 
 ```python
-# analysis_agent.py に追加
-async def run_deep_analysis(request: AnalysisRequest, settings: Settings) -> Dict:
-    # Step 1: Planner - 分析計画を立てる
-    plan = await _create_analysis_plan(request, settings)
-    
-    # Step 2: Critic - 計画を批判的に検証
-    gaps = await _identify_gaps(plan, request, settings)
-    
-    # Step 3: Follow-up - ギャップを埋める追加調査
-    if gaps:
-        additional_data = await _gather_additional_data(gaps, settings)
-        request = _merge_additional_data(request, additional_data)
-    
-    # Step 4: Final - 最終分析
-    return await _final_analysis(request, settings)
+from langdetect import detect
+from deep_translator import GoogleTranslator
+
+def detect_and_translate(comment_text: str) -> str:
+    try:
+        lang = detect(comment_text)
+        if lang != 'en':
+            translator = GoogleTranslator(source=lang, target='en')
+            return translator.translate(comment_text)
+    except:
+        pass
+    return comment_text
 ```
 
-## 📊 成功指標
+## Success Metrics
 
-- **パフォーマンス**: Quickモード < 30秒、Deepモード < 120秒
-- **精度**: 過去マーケットでの予測精度向上
-- **信頼性**: エラー率 < 5%
-- **カバレッジ**: ソース数 > 10件/分析
-- **ユーザー満足度**: 分析品質の向上
+- **Performance**: Quick mode <30s, Deep mode <120s
+- **Reliability**: Error rate <5%
+- **Coverage**: >10 sources per analysis
+- **Accuracy**: Track prediction accuracy on resolved markets
 
-## 🔧 技術スタック追加
+## Technology Stack Additions
 
-- **Twitter API**: `tweepy` または `twitter-api-v2`
 - **Reddit API**: `praw`
-- **言語判定**: `langdetect`
-- **翻訳**: `deep-translator`
-- **キャッシュ**: `redis` または `cachetools`
-- **メトリクス**: `prometheus-client`
+- **Language Detection**: `langdetect`
+- **Translation**: `deep-translator`
+- **Caching**: `redis` or `cachetools`
+- **Metrics**: `prometheus-client`
 - **API**: `fastapi`
-- **Web UI**: `gradio` または `streamlit`
-
+- **Web UI**: `gradio` or `streamlit`

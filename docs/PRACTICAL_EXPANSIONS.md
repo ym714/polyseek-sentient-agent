@@ -1,134 +1,140 @@
-# Reddit/X以外の実用的な拡張案
+# Practical Expansion Options
 
-## ✅ 現在の状況
+## Current Status
 
-- ✅ **News API**: 実装済み・動作中（無料プラン: 1日100リクエスト）
-- ✅ **X API**: 実装済み（無料プランは制限的）
-- ✅ **RSS統合**: 実装済み（SSL証明書の問題で調整が必要）
-- ✅ **マーケットデータ**: Polymarket API（公開・無料）
-- ✅ **コメント分析**: スクレイピング（実装済み）
+✅ **Implemented:**
+- News API: Working (free plan: 100 requests/day)
+- X/Twitter API: Implemented (free plan is limited)
+- RSS integration: Implemented (may need SSL certificate adjustments)
+- Market data: Polymarket API (public, free)
+- Comment analysis: Scraping (implemented)
+- Deep mode: 4-step analysis process (implemented)
 
-## 🚀 実用的な拡張案（無料・簡単に実装可能）
+## Practical Expansion Options (Free & Easy to Implement)
 
-### 1. コメント分析の強化 ⭐⭐⭐⭐⭐（最推奨）
+### 1. Enhanced Comment Analysis ⭐⭐⭐⭐⭐ (Highly Recommended)
 
-**改善点**:
-- 言語判定と翻訳（多言語コメント対応）
-- 感情分析の改善（より正確な判定）
-- スパム/毒性フィルタリング
-- キーワード抽出
+**Improvements:**
+- Language detection and translation (multi-language comment support)
+- Improved sentiment analysis (more accurate detection)
+- Spam/toxicity filtering
+- Keyword extraction
 
-**必要なライブラリ**:
+**Required Libraries:**
 ```bash
 pip install langdetect deep-translator
 ```
 
-**メリット**:
-- ✅ 完全無料
-- ✅ 分析品質が大幅に向上
-- ✅ 多言語マーケットに対応
-- ✅ 実装が比較的簡単
+**Benefits:**
+- ✅ Completely free
+- ✅ Significantly improves analysis quality
+- ✅ Supports multi-language markets
+- ✅ Relatively easy to implement
 
-### 2. キャッシュ機能 ⭐⭐⭐⭐⭐（パフォーマンス向上）
+### 2. Caching Layer ⭐⭐⭐⭐⭐ (Performance Improvement)
 
-**改善点**:
-- マーケットデータのキャッシュ（同じURLの再分析を高速化）
-- ニュース検索結果のキャッシュ
-- API呼び出しの削減
+**Improvements:**
+- Market data caching (faster re-analysis of same URLs)
+- News search result caching
+- Reduced API calls
 
-**必要なライブラリ**:
+**Required Libraries:**
 ```bash
 pip install cachetools
 ```
 
-**メリット**:
-- ✅ 完全無料
-- ✅ レスポンス時間が大幅に短縮
-- ✅ APIコスト削減
-- ✅ 実装が簡単
+**Benefits:**
+- ✅ Completely free
+- ✅ Significantly reduces response time
+- ✅ Reduces API costs
+- ✅ Easy to implement
 
-### 3. Deepモードの実装 ⭐⭐⭐⭐（分析品質向上）
+### 3. Reddit Integration ⭐⭐⭐⭐ (Additional Signal Source)
 
-**改善点**:
-- Planner → Critic → Follow-up → Final の4ステップ分析
-- より深い推論と反証の検証
-- より正確な信頼度評価
+**Improvements:**
+- Reddit API integration for community sentiment
+- Extract relevant threads and comments
+- Community discussion analysis
 
-**メリット**:
-- ✅ 完全無料
-- ✅ 分析品質が大幅に向上
-- ⚠️ 実装に時間がかかる
+**Required Libraries:**
+```bash
+pip install praw
+```
 
-### 4. メトリクスとログ ⭐⭐⭐（運用改善）
+**Benefits:**
+- ✅ Free API (commercial use allowed)
+- ✅ Additional signal source
+- ✅ Community sentiment capture
 
-**改善点**:
-- 処理時間の計測
-- API呼び出し回数の追跡
-- エラー率の監視
-- LLMトークン使用量の追跡
+### 4. Metrics & Logging ⭐⭐⭐ (Operational Improvement)
 
-**メリット**:
-- ✅ 完全無料
-- ✅ 運用とデバッグが容易に
-- ✅ パフォーマンス最適化が可能
+**Improvements:**
+- Processing time measurement
+- API call count tracking
+- Error rate monitoring
+- LLM token usage tracking
 
-### 5. エラーハンドリングの強化 ⭐⭐⭐（信頼性向上）
+**Benefits:**
+- ✅ Completely free
+- ✅ Easier operations and debugging
+- ✅ Enables performance optimization
 
-**改善点**:
-- 自動リトライ（指数バックオフ）
-- フォールバック機能
-- ユーザーフレンドリーなエラーメッセージ
+### 5. Enhanced Error Handling ⭐⭐⭐ (Reliability Improvement)
 
-**メリット**:
-- ✅ 完全無料
-- ✅ 信頼性が向上
-- ✅ ユーザー体験が向上
+**Improvements:**
+- Automatic retry (exponential backoff)
+- Fallback mechanisms
+- User-friendly error messages
 
-## 📊 推奨実装順序
+**Benefits:**
+- ✅ Completely free
+- ✅ Improved reliability
+- ✅ Better user experience
 
-### Phase 1: 即座に価値を提供（1-2日）
+## Recommended Implementation Order
 
-1. **キャッシュ機能**（最も簡単・効果的）
-   - 実装時間: 1-2時間
-   - 効果: 即座にパフォーマンス向上
+### Phase 1: Immediate Value (1-2 days)
 
-2. **コメント分析の強化**（分析品質向上）
-   - 実装時間: 2-4時間
-   - 効果: 多言語対応と分析精度向上
+1. **Caching Layer** (Easiest & Most Effective)
+   - Implementation time: 1-2 hours
+   - Effect: Immediate performance improvement
 
-### Phase 2: 機能性向上（1週間）
+2. **Enhanced Comment Analysis** (Analysis Quality Improvement)
+   - Implementation time: 2-4 hours
+   - Effect: Multi-language support and improved analysis accuracy
 
-3. **Deepモードの実装**（分析品質向上）
-   - 実装時間: 1-2日
-   - 効果: より深い分析
+### Phase 2: Functionality Improvements (1 week)
 
-4. **メトリクスとログ**（運用改善）
-   - 実装時間: 半日
-   - 効果: 運用が容易に
+3. **Reddit Integration** (Additional Signal Source)
+   - Implementation time: 2-4 hours
+   - Effect: Additional community sentiment source
 
-### Phase 3: 信頼性向上（1週間）
+4. **Metrics & Logging** (Operational Improvement)
+   - Implementation time: Half day
+   - Effect: Easier operations
 
-5. **エラーハンドリングの強化**（信頼性向上）
-   - 実装時間: 半日
-   - 効果: 信頼性向上
+### Phase 3: Reliability Improvements (1 week)
 
-## 💡 結論
+5. **Enhanced Error Handling** (Reliability Improvement)
+   - Implementation time: Half day
+   - Effect: Improved reliability
 
-**Reddit/Xなしでも、以下の拡張で十分に機能を向上できます**:
+## Conclusion
 
-1. ✅ **キャッシュ機能**（パフォーマンス向上）
-2. ✅ **コメント分析の強化**（分析品質向上）
-3. ✅ **Deepモード**（分析品質向上）
+Even without Reddit/X, the following expansions can significantly improve functionality:
 
-これらはすべて無料で実装でき、News APIと組み合わせることで、Reddit/Xなしでも強力な分析が可能です。
+1. ✅ **Caching Layer** (Performance improvement)
+2. ✅ **Enhanced Comment Analysis** (Analysis quality improvement)
+3. ✅ **Reddit Integration** (Additional signal source)
 
-## 🎯 次のステップ
+All of these can be implemented for free, and combined with News API, provide powerful analysis capabilities even without Reddit/X.
 
-どの拡張から始めますか？
+## Next Steps
 
-1. **キャッシュ機能**（最も簡単・即効性あり）
-2. **コメント分析の強化**（分析品質向上）
-3. **Deepモード**（分析品質向上）
+Choose which expansion to start with:
 
-すべて実装することも可能です！
+1. **Caching Layer** (Easiest, immediate effect)
+2. **Enhanced Comment Analysis** (Analysis quality improvement)
+3. **Reddit Integration** (Additional signal source)
 
+All can be implemented!

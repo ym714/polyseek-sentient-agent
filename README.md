@@ -44,10 +44,16 @@ polyseek_sentient/
 4. When embedding inside Sentient Agent Framework, instantiate `PolyseekSentientAgent` and wire it into your server/orchestrator.
 
 ## Documentation
+
 See `docs/` directory for detailed documentation:
-- `QUICKSTART.md` - Quick start guide
-- `HOW_IT_WORKS.md` - Architecture and implementation details
-- `DEEP_MODE_GUIDE.md` - Deep mode usage guide
+
+- **QUICKSTART.md** - Installation and basic usage guide
+- **HOW_IT_WORKS.md** - Architecture and implementation details
+- **DEEP_MODE_GUIDE.md** - Deep mode usage guide
+- **API_SETUP.md** - External API configuration guide
+- **UPGRADE_PLAN.md** - Enhancement and upgrade options
+- **PRACTICAL_EXPANSIONS.md** - Practical expansion ideas
+- **PROBLEM_STATEMENT.md** - Problem statement and solution overview
 
 ## Tests
 ```
