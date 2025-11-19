@@ -32,7 +32,12 @@ polyseek_sentient/
 
 ## Quickstart
 1. Install deps: `pip install -r requirements.txt`
-2. Export API keys (see `config.py` for names). At minimum you need one LLM key (OpenRouter/OpenAI via LiteLLM). Polymarket access is public, Kalshi requires credentials. Set `POLYSEEK_OFFLINE=1` to use stubbed data without network access.
+2. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your API keys
+   ```
+   At minimum you need one LLM key (Google/OpenRouter/OpenAI via LiteLLM). Polymarket access is public, Kalshi requires credentials.
 3. Run the demo CLI:
    ```bash
    python -m polyseek_sentient.main "https://polymarket.com/event/..."

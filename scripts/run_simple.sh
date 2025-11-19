@@ -1,9 +1,13 @@
 #!/bin/bash
 # Simple execution script
 
-export GOOGLE_API_KEY="AIzaSyCRzo5VuNWsV6MBrkz6B0-Pebr-tKIPJS8"
-export NEWS_API_KEY="95dd935d45774d9fbfc292e4fe488746"
-export LITELLM_MODEL_ID="gemini/gemini-2.0-flash-001"
+# Load environment variables from .env if it exists
+if [ -f .env ]; then
+    export $(cat .env | grep -v '^#' | xargs)
+fi
+
+# Set defaults only if not already set
+export LITELLM_MODEL_ID="${LITELLM_MODEL_ID:-gemini/gemini-2.0-flash-001}"
 export PYTHONPATH="src:$PYTHONPATH"
 
 cd "$(dirname "$0")/.."
