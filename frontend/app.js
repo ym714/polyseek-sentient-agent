@@ -103,7 +103,44 @@ async function analyzeMarket(marketUrl, depth, perspective) {
             });
 
             if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
+                // Try to get error message from response
+                let errorMessage = `API error: ${response.status}`;
+                try {
+                    // First, get the response text
+                    const responseText = await response.text();
+                    console.error('API error response text:', responseText);
+                    
+                    // Try to parse as JSON
+                    let errorData;
+                    try {
+                        errorData = JSON.parse(responseText);
+                        console.error('API error response JSON:', errorData);
+                    } catch (parseError) {
+                        console.error('Response is not JSON, using raw text');
+                        errorMessage = responseText || `API error: ${response.status} ${response.statusText}`;
+                        throw new Error(errorMessage);
+                    }
+                    
+                    // Extract error message from JSON
+                    if (errorData.detail) {
+                        errorMessage = errorData.detail;
+                    } else if (errorData.message) {
+                        errorMessage = errorData.message;
+                    } else if (errorData.error) {
+                        errorMessage = errorData.error;
+                    } else {
+                        errorMessage = responseText || `API error: ${response.status} ${response.statusText}`;
+                    }
+                } catch (e) {
+                    // If all else fails, use status text
+                    console.error('Failed to parse error response:', e);
+                    if (e.message && e.message !== errorMessage) {
+                        errorMessage = e.message;
+                    } else {
+                        errorMessage = `API error: ${response.status} ${response.statusText}`;
+                    }
+                }
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
@@ -111,7 +148,13 @@ async function analyzeMarket(marketUrl, depth, perspective) {
         }
     } catch (error) {
         console.error('Analysis error:', error);
-        showError('Failed to analyze market. Please try again.');
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
+        const errorMessage = error.message || 'Failed to analyze market. Please try again.';
+        showError(errorMessage);
     } finally {
         hideLoading();
     }
@@ -267,7 +310,36 @@ function updateLoadingStatus(message) {
 }
 
 function showError(message) {
-    alert(message);
+    // Create a more user-friendly error notification
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 z-[110] bg-red-500/90 backdrop-blur-sm border border-red-400/50 rounded-lg px-6 py-4 shadow-xl max-w-2xl';
+    errorDiv.innerHTML = `
+        <div class="flex items-start gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white flex-shrink-0 mt-0.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div class="flex-1">
+                <p class="text-white font-medium mb-1">Analysis Failed</p>
+                <p class="text-white/90 text-sm">${message}</p>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-white/80 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    `;
+    document.body.appendChild(errorDiv);
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+        if (errorDiv.parentElement) {
+            errorDiv.remove();
+        }
+    }, 10000);
 }
 
 function selectMarket(url) {

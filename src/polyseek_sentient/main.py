@@ -233,30 +233,66 @@ async def analyze_market(request: AnalyzeRequest):
     try:
         settings = load_settings()
         
+        # Check for common configuration issues
+        if not settings.llm.api_key:
+            raise HTTPException(
+                status_code=500,
+                detail="LLM API key not configured. Please set POLYSEEK_LLM_API_KEY, OPENROUTER_API_KEY, or OPENAI_API_KEY environment variable."
+            )
+        
         # 1. Fetch Market Data
-        # Note: In a real app, we might want to cache this or handle errors more gracefully
-        market = await fetch_market_data(request.market_url, settings)
+        try:
+            market = await fetch_market_data(request.market_url, settings)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to fetch market data: {str(e)}"
+            )
         
         # 2. Fetch Context
-        context = await fetch_market_context(request.market_url, settings)
+        try:
+            context = await fetch_market_context(request.market_url, settings)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to fetch market context: {str(e)}"
+            )
         
         # 3. Gather Signals
-        signals = await gather_signals(market, settings)
+        try:
+            signals = await gather_signals(market, settings)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to gather signals: {str(e)}"
+            )
         
         # 4. Run Analysis
-        analysis_payload = await run_analysis(
-            AnalysisRequest(
-                market=market,
-                context=context,
-                signals=signals,
-                depth=request.depth,
-                perspective=request.perspective,
-            ),
-            settings,
-        )
+        try:
+            analysis_payload = await run_analysis(
+                AnalysisRequest(
+                    market=market,
+                    context=context,
+                    signals=signals,
+                    depth=request.depth,
+                    perspective=request.perspective,
+                ),
+                settings,
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Analysis failed: {str(e)}"
+            )
         
         # 5. Format Response
-        model, markdown = format_response(analysis_payload)
+        try:
+            model, markdown = format_response(analysis_payload)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to format response: {str(e)}"
+            )
         
         # Construct response matching frontend expectation
         return {
@@ -264,10 +300,23 @@ async def analyze_market(request: AnalyzeRequest):
             "json": model.model_dump()
         }
         
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except Exception as e:
         import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
+        error_trace = traceback.format_exc()
+        error_message = str(e)
+        print(f"Unexpected error in /api/analyze: {error_message}")
+        print(f"Traceback: {error_trace}")
+        # Log to stderr for Vercel logs
+        import sys
+        print(f"Error: {error_message}", file=sys.stderr)
+        print(f"Traceback: {error_trace}", file=sys.stderr)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {error_message}"
+        )
 
 
 if __name__ == "__main__":
