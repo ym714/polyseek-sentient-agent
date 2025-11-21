@@ -2,7 +2,10 @@
 
 // Configuration
 const CONFIG = {
-    API_BASE_URL: 'http://localhost:8000/api',
+    // Use relative URL for local development, absolute URL for production
+    API_BASE_URL: window.location.protocol === 'file:' 
+        ? 'http://localhost:8000/api' 
+        : window.location.origin + '/api',
     MOCK_MODE: false, // Set to false when backend is ready
 };
 
@@ -34,6 +37,8 @@ const elements = {
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Clear input field on page load
+    elements.marketUrl.value = '';
     initEventListeners();
     loadTrendingMarkets();
 });
@@ -112,41 +117,73 @@ async function analyzeMarket(marketUrl, depth, perspective) {
     }
 }
 
+// Fallback mock markets
+const getMockMarkets = () => [
+    {
+        id: 1,
+        title: 'Will Bitcoin hit $100k in 2024?',
+        price: '0.65',
+        volume: '$12M',
+        url: 'https://polymarket.com/event/will-bitcoin-hit-100k-in-2024',
+    },
+    {
+        id: 2,
+        title: 'Russia x Ukraine Ceasefire in 2025?',
+        price: '0.15',
+        volume: '$5M',
+        url: 'https://polymarket.com/event/russia-x-ukraine-ceasefire-in-2025',
+    },
+    {
+        id: 3,
+        title: 'Will AI surpass human performance in coding by 2026?',
+        price: '0.42',
+        volume: '$1.8M',
+        url: 'https://polymarket.com/event/ai-coding-2026',
+    },
+];
+
 async function loadTrendingMarkets() {
+    // Always try to use mock markets first if MOCK_MODE is enabled
+    if (CONFIG.MOCK_MODE) {
+        const mockMarkets = getMockMarkets();
+        renderTrendingMarkets(mockMarkets);
+        return;
+    }
+
+    // Try to fetch from API with fallback to mock data
     try {
-        if (CONFIG.MOCK_MODE) {
-            const mockMarkets = [
-                {
-                    id: 1,
-                    title: 'Will Bitcoin reach $100,000 by end of 2025?',
-                    price: '67¢',
-                    volume: '$2.4M',
-                    url: 'https://polymarket.com/event/bitcoin-100k-2025',
-                },
-                {
-                    id: 2,
-                    title: 'Will AI surpass human performance in coding by 2026?',
-                    price: '42¢',
-                    volume: '$1.8M',
-                    url: 'https://polymarket.com/event/ai-coding-2026',
-                },
-                {
-                    id: 3,
-                    title: 'Will there be a recession in 2025?',
-                    price: '31¢',
-                    volume: '$3.2M',
-                    url: 'https://polymarket.com/event/recession-2025',
-                },
-            ];
-            renderTrendingMarkets(mockMarkets);
-        } else {
-            const response = await fetch(`${CONFIG.API_BASE_URL}/trending`);
-            const markets = await response.json();
+        // Create timeout promise
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Request timeout')), 5000);
+        });
+
+        const fetchPromise = fetch(`${CONFIG.API_BASE_URL}/trending`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        const markets = await response.json();
+        console.log('API response:', markets);
+
+        // Validate response
+        if (Array.isArray(markets) && markets.length > 0) {
             renderTrendingMarkets(markets);
+        } else {
+            throw new Error('Invalid API response format');
         }
     } catch (error) {
-        console.error('Failed to load trending markets:', error);
-        elements.marketsGrid.innerHTML = '<div class="col-span-full text-center text-neutral-500">Failed to load trending markets</div>';
+        console.warn('Failed to load trending markets from API, using fallback:', error);
+        // Fallback to mock markets on error
+        const mockMarkets = getMockMarkets();
+        renderTrendingMarkets(mockMarkets);
     }
 }
 
@@ -155,11 +192,18 @@ async function loadTrendingMarkets() {
 // ============================================
 function renderTrendingMarkets(markets) {
     if (!markets || markets.length === 0) {
-        elements.marketsGrid.innerHTML = '<div class="col-span-full text-center text-neutral-500">No trending markets available</div>';
+        // Fallback to mock markets if empty
+        const mockMarkets = getMockMarkets();
+        console.warn('No markets provided, using fallback');
+        renderTrendingMarkets(mockMarkets);
         return;
     }
 
-    elements.marketsGrid.innerHTML = markets.map(market => `
+    // Show only first 3 markets
+    const displayMarkets = markets.slice(0, 3);
+    console.log('Displaying markets:', displayMarkets.length, displayMarkets);
+
+    elements.marketsGrid.innerHTML = displayMarkets.map(market => `
     <div class="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-5 hover:bg-white/10 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/10" onclick="selectMarket('${market.url}')">
       <div class="flex justify-between items-start mb-4">
         <h3 class="text-lg font-medium text-white/90 group-hover:text-white line-clamp-2 min-h-[3.5rem]">${market.title}</h3>
@@ -227,8 +271,12 @@ function showError(message) {
 }
 
 function selectMarket(url) {
-    elements.marketUrl.value = url;
-    elements.marketUrl.focus();
+    // Clear any existing value and set the new URL
+    elements.marketUrl.value = '';
+    setTimeout(() => {
+        elements.marketUrl.value = url;
+        elements.marketUrl.focus();
+    }, 10);
     // Smooth scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }

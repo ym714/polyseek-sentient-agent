@@ -24,6 +24,7 @@ wheels/
 venv/
 env/
 ENV/
+.venv/
 
 # IDE
 .vscode/
@@ -42,6 +43,8 @@ ENV/
 .pytest_cache/
 .coverage
 htmlcov/
+.mypy_cache/
+.hypothesis/
 
 # OS
 .DS_Store
@@ -50,7 +53,7 @@ Thumbs.db
 # Logs
 *.log
 
-# Optional: Submission files (uncomment if you don't want to commit these)
-# SUBMISSION_*.txt
-
-.env
+# Temporary files
+*.tmp
+*.temp
+image_base64.txt

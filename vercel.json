@@ -16,8 +16,20 @@
       "dest": "/api/index.py"
     },
     {
+      "src": "/assets/(.*)",
+      "dest": "/frontend/assets/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/frontend/$1"
     }
-  ]
+  ],
+  "env": {
+    "PYTHONPATH": "src"
+  },
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.9"
+    }
+  }
 }

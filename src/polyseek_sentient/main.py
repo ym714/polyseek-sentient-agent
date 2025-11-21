@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import uuid
 from dataclasses import dataclass
 from typing import Optional, List
@@ -175,9 +176,13 @@ def main():
 
 app = FastAPI(title="Polyseek Sentient API")
 
+import os
+
+# CORS configuration: Get from environment variable in production, allow all in development
+cors_origins = os.getenv("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For local development
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -201,24 +206,24 @@ async def get_trending():
     return [
         {
             "id": 1,
-            "title": "Will Bitcoin reach $100,000 by end of 2025?",
-            "price": "67¢",
-            "volume": "$2.4M volume",
-            "url": "https://polymarket.com/event/bitcoin-100k-2025",
+            "title": "Will Bitcoin hit $100k in 2024?",
+            "price": "0.65",
+            "volume": "$12M",
+            "url": "https://polymarket.com/event/will-bitcoin-hit-100k-in-2024",
         },
         {
             "id": 2,
-            "title": "Will AI surpass human performance in coding by 2026?",
-            "price": "42¢",
-            "volume": "$1.8M volume",
-            "url": "https://polymarket.com/event/ai-coding-2026",
+            "title": "Russia x Ukraine Ceasefire in 2025?",
+            "price": "0.15",
+            "volume": "$5M",
+            "url": "https://polymarket.com/event/russia-x-ukraine-ceasefire-in-2025",
         },
         {
             "id": 3,
-            "title": "Will there be a recession in 2025?",
-            "price": "31¢",
-            "volume": "$3.2M volume",
-            "url": "https://polymarket.com/event/recession-2025",
+            "title": "Will AI surpass human performance in coding by 2026?",
+            "price": "0.42",
+            "volume": "$1.8M",
+            "url": "https://polymarket.com/event/ai-coding-2026",
         },
     ]
 

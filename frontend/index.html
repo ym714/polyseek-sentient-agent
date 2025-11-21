@@ -4,8 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polyseek Sentient | See the future.</title>
+    <title>Polyseek</title>
     <meta name="description" content="AI-powered deep research for prediction markets. Supports Polymarket and Kalshi.">
+    
+    <!-- Favicon with white circle background (Google style) -->
+    <!-- SVG favicon with white circle background (preferred) -->
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+    <!-- PNG fallback for older browsers -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/image.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/image.png">
+    <!-- Apple Touch Icon (for iOS) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/image.png">
+    <!-- Shortcut icon -->
+    <link rel="shortcut icon" type="image/png" href="./assets/image.png">
+    <!-- Default favicon -->
+    <link rel="icon" href="./assets/image.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,6 +28,7 @@
         rel="stylesheet">
 
     <!-- Tailwind CSS -->
+    <!-- Note: CDN is used for development. For production, use PostCSS plugin or Tailwind CLI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -209,7 +223,7 @@
                     <!-- Title -->
                     <div class="space-y-6 opacity-0 animate-[fadeIn_0.8s_ease-out_0.2s_forwards]">
                         <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight font-space">
-                            <span class="text-white drop-shadow-lg">See the future.</span>
+                            <span class="text-white drop-shadow-lg">Know before it happens.</span>
                         </h1>
 
                         <!-- Subtitle -->
@@ -217,8 +231,8 @@
                             <div
                                 class="bg-white/5 backdrop-blur-sm px-4 py-2 rounded-2xl border border-white/10 max-w-2xl">
                                 <p class="text-lg md:text-xl text-white/90 leading-relaxed text-center">
-                                    In hindsight, we all would've bought Bitcoin.<br class="hidden sm:block" />
-                                    Seer into the future, so you can retire off the next one.
+                                    Prediction markets show what might happen.<br class="hidden sm:block" />
+                                    We show you why—and what to do about it.
                                 </p>
                             </div>
                         </div>
@@ -227,38 +241,30 @@
                     <!-- Input Form -->
                     <form id="analysisForm"
                         class="space-y-4 max-w-2xl mx-auto opacity-0 animate-[fadeIn_0.8s_ease-out_0.4s_forwards]">
-                        <div class="relative flex gap-2 transition-all duration-300">
+                        <div class="relative flex flex-col gap-3 transition-all duration-300">
                             <div class="relative w-full group">
                                 <input type="url" id="marketUrl" class="flex min-w-0 rounded-lg border py-1 shadow-sm transition-all outline-none 
                                            disabled:opacity-50 md:text-sm h-12 md:h-14 text-base px-4 md:px-6 
                                            bg-white/5 backdrop-blur-sm border-white/10 
                                            focus:bg-white/10 focus:border-white/30 focus:ring-1 focus:ring-white/30
-                                           placeholder:text-neutral-500 w-full text-white pr-[30rem]"
-                                    placeholder="Paste Polymarket or Kalshi URL..." required />
-                                <div class="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2 items-center">
-                                    <select id="depth"
-                                        class="bg-black/40 border border-white/10 rounded text-xs px-2 py-1.5 text-neutral-300 focus:outline-none focus:border-white/30 hover:bg-white/5 transition-colors cursor-pointer">
-                                        <option value="quick">Quick</option>
-                                        <option value="deep">Deep</option>
-                                    </select>
-                                    <select id="perspective"
-                                        class="bg-black/40 border border-white/10 rounded text-xs px-2 py-1.5 text-neutral-300 focus:outline-none focus:border-white/30 hover:bg-white/5 transition-colors cursor-pointer">
-                                        <option value="neutral">Neutral</option>
-                                        <option value="devils_advocate">Devil's</option>
-                                    </select>
-                                    <button type="submit"
-                                        class="bg-white text-black px-4 py-1.5 rounded-md font-medium text-sm hover:bg-neutral-200 transition-colors shadow-lg shadow-white/5">
-                                        Analyze
-                                    </button>
-                                </div>
+                                           placeholder:text-neutral-500 w-full text-white"
+                                    placeholder="https://polymarket.com/event/..." required />
                             </div>
-                        </div>
-
-                        <!-- Powered By -->
-                        <div class="flex justify-center mt-4">
-                            <div
-                                class="relative flex items-center gap-2 bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
-                                <span class="text-sm text-white/60 font-medium">Powered by Sentient</span>
+                            <div class="flex gap-3 items-center justify-center">
+                                <select id="depth"
+                                    class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg text-sm px-4 py-2.5 text-neutral-300 focus:outline-none focus:border-white/30 hover:bg-white/10 transition-colors cursor-pointer">
+                                    <option value="quick">Quick</option>
+                                    <option value="deep">Deep</option>
+                                </select>
+                                <select id="perspective"
+                                    class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg text-sm px-4 py-2.5 text-neutral-300 focus:outline-none focus:border-white/30 hover:bg-white/10 transition-colors cursor-pointer">
+                                    <option value="neutral">Neutral</option>
+                                    <option value="devils_advocate">Devil's Advocate</option>
+                                </select>
+                                <button type="submit"
+                                    class="bg-white text-black px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-neutral-200 transition-colors shadow-lg shadow-white/5">
+                                    Analyze
+                                </button>
                             </div>
                         </div>
                     </form>
