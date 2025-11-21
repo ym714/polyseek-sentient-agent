@@ -1,0 +1,11 @@
+[nixpacks]
+providers = ["python"]
+
+[phases.setup]
+nixPkgs = ["python311", "pip"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "uvicorn src.polyseek_sentient.main:app --host 0.0.0.0 --port $PORT"
