@@ -1,7 +1,8 @@
 # Polyseek Sentient Agent (MVP)
 
-This package contains a Sentient-compatible agent that analyzes Polymarket/Kalshi markets without Valyu.  
-It fetches market metadata, scrapes on-page context, pulls external signals (news, X, Reddit via pluggable providers), runs an LLM-based synthesis, and returns a Markdown + JSON verdict.
+**Automated prediction market analysis that transforms 30+ minutes of manual research into 30-120 seconds of structured insights.**
+
+Polyseek is an AI agent that analyzes Polymarket and Kalshi markets by aggregating data from APIs, scraping market context, and synthesizing external signals (news, social media) into actionable verdicts with confidence scores and bias mitigation
 
 ## Key Features
 - URL-based market detection (Polymarket/Kalshi)
