@@ -380,62 +380,127 @@ def _build_final_prompt(request: AnalysisRequest, plan: Dict, critique: Dict) ->
     }, indent=2)
     
     return f"""
-You are performing the FINAL deep analysis of a prediction market. You have:
-1. Created an analysis plan
-2. Critically evaluated it and identified gaps
-3. Gathered additional information
+You are performing the FINAL deep analysis of a prediction market. This is a COMPREHENSIVE, PROFESSIONAL-GRADE analysis.
 
-Now perform the final comprehensive analysis.
+You have completed:
+1. ✅ Created a structured analysis plan
+2. ✅ Critically evaluated the plan and identified gaps
+3. ✅ Gathered comprehensive evidence from multiple sources
 
-Market:
+Now perform the final deep analysis with MAXIMUM RIGOR and INSIGHT.
+
+=== MARKET INFORMATION ===
 - Title: {market.title}
 - Category: {market.category}
-- Deadline UTC: {market.deadline}
-- Prices: YES={market.prices.yes} NO={market.prices.no}
+- Deadline: {market.deadline}
+- Current Prices: YES={market.prices.yes} ({float(market.prices.yes)*100:.1f}%), NO={market.prices.no} ({float(market.prices.no)*100:.1f}%)
 - Liquidity: {market.liquidity}
-- Volume 24h: {market.volume_24h}
-- Resolution rules: {rules}
+- Volume (24h): {market.volume_24h}
+- Resolution Rules: {rules}
 
-Analysis Plan:
+=== ANALYSIS PLAN ===
 {plan_summary}
 
-Critique Findings:
+=== CRITICAL GAPS IDENTIFIED ===
 {critique_summary}
 
-Platform comments:
+=== EVIDENCE BASE ===
+
+Platform Discussion:
 {comments_block}
 
-External signals (including follow-up research):
+External Intelligence:
 {signals_block}
 
-Operating mode:
-- Depth: deep
-- Perspective: {request.perspective}
+=== ANALYTICAL FRAMEWORK ===
 
-Perform a comprehensive analysis considering:
-1. The original plan
-2. The critique findings
-3. All available evidence (original + follow-up)
-4. Both pro and con arguments
-5. Uncertainty factors
+You MUST apply the following analytical frameworks:
+
+1. **BASE RATE ANALYSIS**
+   - What is the historical base rate for similar events?
+   - How does the current market price compare to the base rate?
+   - What factors justify deviation from the base rate?
+
+2. **SCENARIO PLANNING**
+   - Identify 3-5 distinct scenarios (optimistic, pessimistic, most likely)
+   - Assign probabilities to each scenario
+   - Explain key triggers and indicators for each scenario
+
+3. **EVIDENCE QUALITY ASSESSMENT**
+   - Evaluate source credibility (primary vs secondary, expert vs opinion)
+   - Assess recency and relevance of evidence
+   - Identify potential biases in sources
+
+4. **CAUSAL REASONING**
+   - Map causal chains: X → Y → Outcome
+   - Identify necessary vs sufficient conditions
+   - Highlight feedback loops and second-order effects
+
+5. **UNCERTAINTY QUANTIFICATION**
+   - Distinguish between epistemic (knowledge) and aleatory (randomness) uncertainty
+   - Identify key unknowns and information gaps
+   - Specify what new information would most change your assessment
+
+=== OUTPUT REQUIREMENTS ===
 
 Respond with valid JSON containing:
-- verdict: "YES" | "NO" | "UNCERTAIN"
-- confidence_pct: number between 0-100
-- summary: comprehensive analysis summary (5-8 sentences) describing your analysis, key findings, reasoning, and implications
-- key_drivers: array of objects with "text" (detailed explanation, 2-3 sentences each) and "source_ids", maximum 5 items for deep analysis
-- uncertainty_factors: array of strings (at least 3-5 factors)
-- next_steps: array of strings (recommended: 3-5 actionable steps)
-- sources: array of objects with "id", "title", "url", "type", "sentiment"
 
-IMPORTANT: 
-- This is a DEEP analysis - be thorough and consider all angles
-- Provide detailed explanations in key_drivers - each driver should be 2-3 sentences explaining the factor, its impact, and why it matters
-- Write a comprehensive summary (5-8 sentences) that covers your analysis methodology, key findings, reasoning, and implications
-- Cite source IDs in key_drivers
-- sources[].type must be "market", "comment", "sns", or "news"
-- Include multiple sources (at least 3-5)
-- If evidence is insufficient, verdict MUST be UNCERTAIN
+- **verdict**: "YES" | "NO" | "UNCERTAIN"
+- **confidence_pct**: 0-100 (your confidence in the verdict, NOT the probability of YES)
+- **summary**: 8-12 sentences providing:
+  * Opening context and market overview (2 sentences)
+  * Base rate analysis and market comparison (2 sentences)
+  * Key evidence synthesis (3-4 sentences)
+  * Scenario analysis (2 sentences)
+  * Final assessment with caveats (2 sentences)
+
+- **key_drivers**: Array of 5-7 drivers, each with:
+  * "text": 3-5 sentences explaining:
+    - What the driver is
+    - Why it matters (causal mechanism)
+    - How strong the evidence is
+    - Potential counterarguments
+  * "source_ids": Array of relevant source IDs
+
+- **uncertainty_factors**: Array of 5-8 factors, each being:
+  * Specific and actionable
+  * Categorized (epistemic vs aleatory if relevant)
+  * Quantifiable where possible
+
+- **next_steps**: Array of 5-7 actionable recommendations:
+  * Specific information to gather
+  * Key indicators to monitor
+  * Decision triggers
+
+- **sources**: Array of all cited sources with:
+  * "id": Unique identifier
+  * "title": Full title
+  * "url": Complete URL
+  * "type": "market" | "comment" | "sns" | "news"
+  * "sentiment": "pro" | "con" | "neutral"
+
+=== QUALITY STANDARDS ===
+
+Your analysis MUST demonstrate:
+- ✅ Deep domain knowledge and contextual understanding
+- ✅ Rigorous evidence evaluation and source criticism
+- ✅ Clear causal reasoning and logical argumentation
+- ✅ Balanced consideration of pro/con arguments
+- ✅ Explicit acknowledgment of uncertainties and limitations
+- ✅ Actionable insights and recommendations
+- ✅ Professional-grade writing (clear, precise, jargon-free)
+
+=== CRITICAL REMINDERS ===
+
+- This is DEEP mode - provide MAXIMUM detail and insight
+- Each key_driver should be 3-5 sentences (not 1-2)
+- Summary should be 8-12 sentences (not 3-5)
+- Cite specific evidence with source IDs
+- Be intellectually honest about uncertainties
+- Avoid generic statements - be specific and concrete
+- Think like a professional analyst, not a chatbot
+
+NOW PERFORM THE ANALYSIS:
 """
 
 
