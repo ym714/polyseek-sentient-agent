@@ -37,7 +37,7 @@ class LLMSettings:
         or os.getenv("OPENAI_API_KEY")
     )
     temperature: float = float(os.getenv("LLM_TEMPERATURE", "0.2"))
-    max_tokens: int = int(os.getenv("LLM_MAX_TOKENS", "2048"))
+    max_tokens: int = int(os.getenv("LLM_MAX_TOKENS", "8192"))  # Increased from 2048 to 8192 for deep analysis
 
 
 @dataclass(frozen=True)
