@@ -32,6 +32,7 @@ class LLMSettings:
     model: str = os.getenv("LITELLM_MODEL_ID", "openrouter/google/gemini-2.0-flash-001")
     api_key: Optional[str] = (
         os.getenv("POLYSEEK_LLM_API_KEY")
+        or os.getenv("GOOGLE_API_KEY")
         or os.getenv("OPENROUTER_API_KEY")
         or os.getenv("OPENAI_API_KEY")
     )

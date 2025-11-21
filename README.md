@@ -32,13 +32,40 @@ polyseek_sentient/
 ```
 
 ## Quickstart
-1. Install deps: `pip install -r requirements.txt`
-2. Set up environment variables:
+
+### Local Development (Web UI)
+
+1. **Setup**:
    ```bash
-   cp .env.example .env
-   # Edit .env and add your API keys
+   ./scripts/setup_local.sh
    ```
-   At minimum you need one LLM key (Google/OpenRouter/OpenAI via LiteLLM). Polymarket access is public, Kalshi requires credentials.
+
+2. **Create `.env` file** in the project root:
+   ```bash
+   POLYSEEK_LLM_API_KEY=your-api-key
+   LITELLM_MODEL_ID=openrouter/google/gemini-2.0-flash-001
+   # Optional:
+   NEWS_API_KEY=your-news-api-key
+   ```
+
+3. **Start the backend server**:
+   ```bash
+   ./scripts/run_local.sh
+   ```
+   The API will be available at `http://localhost:8000`
+
+4. **Open the frontend**:
+   - Option 1: Open `frontend/index.html` directly in your browser
+   - Option 2: Use a local HTTP server:
+     ```bash
+     cd frontend && python3 -m http.server 3000
+     ```
+     Then open `http://localhost:3000`
+
+### CLI Usage
+
+1. Install deps: `pip install -r requirements.txt`
+2. Set up environment variables (same as above)
 3. Run the demo CLI:
    ```bash
    python -m polyseek_sentient.main "https://polymarket.com/event/..."
@@ -47,7 +74,6 @@ polyseek_sentient/
    ```bash
    ./scripts/run_simple.sh "https://polymarket.com/event/..."
    ```
-4. When embedding inside Sentient Agent Framework, instantiate `PolyseekSentientAgent` and wire it into your server/orchestrator.
 
 ## Documentation
 

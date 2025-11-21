@@ -68,7 +68,34 @@ async def _run_quick_analysis(
         response_format={"type": "json_object"},
     )
     content = response["choices"][0]["message"]["content"]
-    result = _parse_response_json(content)
+    
+    # Try direct JSON parse first (most common case)
+    import json
+    try:
+        # Clean the content
+        cleaned_content = content.strip()
+        # Remove markdown code blocks if present
+        if cleaned_content.startswith("```json"):
+            cleaned_content = cleaned_content[7:].strip()
+        elif cleaned_content.startswith("```"):
+            cleaned_content = cleaned_content[3:].strip()
+        if cleaned_content.endswith("```"):
+            cleaned_content = cleaned_content[:-3].strip()
+        
+        # Try to parse directly
+        direct_parse = json.loads(cleaned_content)
+        if isinstance(direct_parse, dict) and all(field in direct_parse for field in ["verdict", "confidence_pct", "summary", "key_drivers", "sources"]):
+            result = direct_parse
+        else:
+            # Missing required fields, use fallback parser
+            result = _parse_response_json(content)
+    except (json.JSONDecodeError, ValueError) as e:
+        # JSON parse failed, use fallback parser
+        result = _parse_response_json(content)
+    
+    # Ensure result is a dict
+    if not isinstance(result, dict):
+        result = {}
     
     # Validate that result has required fields
     required_fields = ["verdict", "confidence_pct", "summary", "key_drivers", "sources"]
@@ -427,6 +454,7 @@ REMEMBER: You MUST return a complete JSON object with ALL required fields: verdi
 def _parse_response_json(raw: str) -> Dict:
     """Parse JSON response with fallback handling for malformed JSON."""
     import re
+    import json
     
     cleaned = raw.strip()
     
@@ -448,7 +476,25 @@ def _parse_response_json(raw: str) -> Dict:
     
     # Try parsing
     try:
-        return json.loads(cleaned)
+        parsed = json.loads(cleaned)
+        # Validate required fields
+        if isinstance(parsed, dict) and all(field in parsed for field in ["verdict", "confidence_pct", "summary", "key_drivers", "sources"]):
+            return parsed
+        else:
+            # Missing required fields, continue to fallback handling
+            pass
+    except json.JSONDecodeError as e:
+        # JSON parse error - try to fix common issues
+        # Try to fix common JSON issues
+        try:
+            # Fix trailing commas
+            fixed = re.sub(r',(\s*[}\]])', r'\1', cleaned)
+            # Try parsing again
+            parsed = json.loads(fixed)
+            if isinstance(parsed, dict) and all(field in parsed for field in ["verdict", "confidence_pct", "summary", "key_drivers", "sources"]):
+                return parsed
+        except Exception:
+            pass
     except json.JSONDecodeError as e:
         # Try to fix common JSON issues
         try:
@@ -517,14 +563,35 @@ def _parse_response_json(raw: str) -> Dict:
                     return json.loads(json_match.group(0))
                 except:
                     pass
-        except Exception:
-            pass
+        except Exception as parse_error:
+            # Last resort: return a fallback structure
+            return {
+                "verdict": "UNCERTAIN",
+                "confidence_pct": 50.0,
+                "summary": f"JSON parsing error: {str(parse_error)}. Raw response (first 300 chars): {cleaned[:300]}...",
+                "key_drivers": [
+                    {
+                        "text": "Unable to parse LLM response - JSON format error",
+                        "source_ids": ["SRC_PARSE_ERROR"],
+                    }
+                ],
+                "uncertainty_factors": ["LLM response parsing failed - invalid JSON format"],
+                "sources": [
+                    {
+                        "id": "SRC_PARSE_ERROR",
+                        "title": "Parse Error",
+                        "url": "",
+                        "type": "news",
+                        "sentiment": "neutral",
+                    }
+                ],
+            }
         
         # Last resort: return a fallback structure
         return {
             "verdict": "UNCERTAIN",
             "confidence_pct": 50.0,
-            "summary": f"JSON parsing error: {str(e)}. Raw response (first 300 chars): {cleaned[:300]}...",
+            "summary": f"JSON parsing error: Unable to parse response. Raw response (first 300 chars): {cleaned[:300]}...",
             "key_drivers": [
                 {
                     "text": "Unable to parse LLM response - JSON format error",
