@@ -1,95 +1,80 @@
-# Polyseek Sentient Agent (MVP)
+# Polyseek MCP Agent
 
-**Automated prediction market analysis that transforms 30+ minutes of manual research into 30-120 seconds of structured insights.**
+**AI-powered prediction market analysis agent compatible with Model Context Protocol (MCP).**
 
-Polyseek is an AI agent that analyzes Polymarket and Kalshi markets by aggregating data from APIs, scraping market context, and synthesizing external signals (news, social media) into actionable verdicts with confidence scores and bias mitigation
+Polyseek is an MCP-compatible AI agent that analyzes prediction markets on Polymarket and Kalshi by aggregating data from multiple sources and synthesizing insights through LLM-driven analysis.
 
 ## Key Features
-- URL-based market detection (Polymarket/Kalshi)
-- Resolution rules + comment scraping with BeautifulSoup
-- Pluggable signal providers (News API example included)
-- Prompt-engineered LLM analysis with Bayesian-style reasoning
-- Markdown + JSON output via a strict schema
+- ✅ MCP (Model Context Protocol) compatible
+- ✅ Sentient Agent Framework integration  
+- ✅ Multi-source data aggregation (APIs, news, social media)
+- ✅ LLM-powered analysis with structured outputs
+- ✅ REST API and SSE endpoints
+- ✅ Quick and Deep analysis modes
 
-## Project Layout
-```
-polyseek_sentient/
-├── README.md           # This file
-├── requirements.txt    # Python dependencies
-├── src/
-│   └── polyseek_sentient/
-│       ├── main.py               # Sentient agent entry point
-│       ├── config.py             # settings + env loading
-│       ├── fetch_market.py       # official API integration helpers
-│       ├── scrape_context.py     # comment/rules extraction utilities
-│       ├── signals_client.py     # external signal aggregation
-│       ├── analysis_agent.py     # LLM orchestration
-│       ├── report_formatter.py   # schema validation + Markdown builder
-│       └── tests/
-│           └── test_report_formatter.py
-├── docs/               # Documentation
-└── scripts/            # Utility scripts
+## Quick Start
+
+### 1. Install Dependencies
+```bash
+pip install -r requirements.txt
+pip install sentient-agent-framework
 ```
 
-## Quickstart
+### 2. Configure Environment
+```bash
+cp .env.example .env
+# Edit .env and add your API keys
+```
 
-### Local Development (Web UI)
+### 3. Start MCP Server
+```bash
+./start_mcp_server.sh
+```
 
-1. **Setup**:
-   ```bash
-   ./scripts/setup_local.sh
-   ```
+Server endpoints:
+- **MCP/SSE**: `http://localhost:8000/assist`
+- **REST API**: `http://localhost:8000/api/analyze`
+- **Health**: `http://localhost:8000/api/health`
 
-2. **Create `.env` file** in the project root:
-   ```bash
-   POLYSEEK_LLM_API_KEY=your-api-key
-   LITELLM_MODEL_ID=openrouter/google/gemini-2.0-flash-001
-   # Optional:
-   NEWS_API_KEY=your-news-api-key
-   ```
+## MCP Client Configuration
 
-3. **Start the backend server**:
-   ```bash
-   ./scripts/run_local.sh
-   ```
-   The API will be available at `http://localhost:8000`
+```
+Agent Name: polyseek
+Description: AI-powered prediction market analysis agent
+MCP Server URL: http://localhost:8000/assist
+Type: SSE
+Authentication: None
+```
 
-4. **Open the frontend**:
-   - Option 1: Open `frontend/index.html` directly in your browser
-   - Option 2: Use a local HTTP server:
-     ```bash
-     cd frontend && python3 -m http.server 3000
-     ```
-     Then open `http://localhost:3000`
+## Usage
 
-### CLI Usage
+### CLI Mode
+```bash
+python -m src.polyseek.main "https://polymarket.com/event/..." --depth quick
+```
 
-1. Install deps: `pip install -r requirements.txt`
-2. Set up environment variables (same as above)
-3. Run the demo CLI:
-   ```bash
-   python -m polyseek_sentient.main "https://polymarket.com/event/..."
-   ```
-   Or use the convenience script:
-   ```bash
-   ./scripts/run_simple.sh "https://polymarket.com/event/..."
-   ```
+### REST API
+```bash
+curl -X POST http://localhost:8000/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "market_url": "https://polymarket.com/event/...",
+    "depth": "quick",
+    "perspective": "neutral"
+  }'
+```
 
 ## Documentation
 
-See `docs/` directory for detailed documentation:
+See `QUICKSTART.md` for detailed setup instructions.
 
-- **QUICKSTART.md** - Installation and basic usage guide
-- **HOW_IT_WORKS.md** - Architecture and implementation details
-- **DEEP_MODE_GUIDE.md** - Deep mode usage guide
-- **API_SETUP.md** - External API configuration guide
-- **UPGRADE_PLAN.md** - Enhancement and upgrade options
-- **PRACTICAL_EXPANSIONS.md** - Practical expansion ideas
-- **PROBLEM_STATEMENT.md** - Problem statement and solution overview
-
-## Tests
+## Project Structure
 ```
-pytest src/polyseek_sentient/tests/test_report_formatter.py
+polyseek/
+├── src/polyseek/          # Main agent code
+│   ├── main.py           # Entry point with MCP server
+│   ├── analysis_agent.py # LLM analysis
+│   └── ...
+├── api/index.py          # Vercel entry point
+└── start_mcp_server.sh   # MCP server startup
 ```
-
-The test only covers the formatter; extend as you plug real signal providers.

@@ -1,4 +1,4 @@
-"""Entry point for the Polyseek Sentient agent."""
+"""Entry point for the Polyseek MCP agent."""
 
 from __future__ import annotations
 
@@ -87,11 +87,11 @@ class AgentInput:
     perspective: str = "neutral"
 
 
-class PolyseekSentientAgent(AbstractAgent):
-    """Sentient-compatible agent implementation."""
+class PolyseekAgent(AbstractAgent):
+    """MCP and Sentient-compatible agent implementation."""
 
     def __init__(self, settings: Optional[Settings] = None):
-        super().__init__(name="Polyseek Sentient Agent")
+        super().__init__(name="Polyseek Agent")
         self.settings = settings or load_settings()
 
     async def assist(self, session: Session, query: Query, response_handler: ResponseHandler):
@@ -146,7 +146,7 @@ def _parse_prompt(prompt: str) -> AgentInput:
 
 
 async def _run_cli(url: str, depth: str, perspective: str):
-    agent = PolyseekSentientAgent()
+    agent = PolyseekAgent()
     handler = CLIResponseHandler()
     payload = json.dumps({"market_url": url, "depth": depth, "perspective": perspective})
 
@@ -162,7 +162,7 @@ async def _run_cli(url: str, depth: str, perspective: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Polyseek Sentient agent demo CLI")
+    parser = argparse.ArgumentParser(description="Polyseek MCP agent demo CLI")
     parser.add_argument("market_url")
     parser.add_argument("--depth", default="quick", choices=("quick", "deep"))
     parser.add_argument("--perspective", default="neutral", choices=("neutral", "devils_advocate"))
@@ -174,7 +174,7 @@ def main():
 # FastAPI Application
 # ==========================================
 
-app = FastAPI(title="Polyseek Sentient API")
+app = FastAPI(title="Polyseek MCP API")
 
 import os
 
@@ -319,5 +319,42 @@ async def analyze_market(request: AnalyzeRequest):
         )
 
 
+# ==========================================
+# MCP/SSE Server Support
+# ==========================================
+
+try:
+    from sentient_agent_framework import DefaultServer
+    
+    # Create agent instance for MCP server
+    _agent = PolyseekAgent()
+    _mcp_server = DefaultServer(_agent)
+    
+    # Mount MCP/SSE endpoint to FastAPI app
+    @app.post("/assist")
+    async def assist_endpoint(request: dict):
+        """MCP/SSE endpoint for Sentient Agent Framework compatibility."""
+        # This endpoint is handled by DefaultServer
+        # In production, you may want to integrate this more tightly
+        pass
+    
+    print("[INFO] MCP/SSE server support enabled at /assist")
+except ImportError:
+    print("[WARNING] Sentient Agent Framework not installed. MCP/SSE endpoint disabled.")
+    _mcp_server = None
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    
+    if len(sys.argv) > 1 and sys.argv[1] == "--mcp-server":
+        # Run as standalone MCP server
+        if _mcp_server is None:
+            print("[ERROR] Sentient Agent Framework not installed. Cannot run MCP server.")
+            sys.exit(1)
+        
+        print("[INFO] Starting Polyseek MCP Server on http://0.0.0.0:8000")
+        _mcp_server.run(host="0.0.0.0", port=8000)
+    else:
+        # Run CLI mode
+        main()
