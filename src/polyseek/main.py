@@ -323,25 +323,91 @@ async def analyze_market(request: AnalyzeRequest):
 # MCP/SSE Server Support
 # ==========================================
 
-try:
-    from sentient_agent_framework import DefaultServer
+from fastapi.responses import StreamingResponse
+from typing import AsyncGenerator
+
+# Create agent instance for MCP server
+_agent = PolyseekAgent()
+
+class SSEResponseHandler:
+    """Response handler that generates SSE events."""
     
-    # Create agent instance for MCP server
-    _agent = PolyseekAgent()
-    _mcp_server = DefaultServer(_agent)
+    def __init__(self):
+        self.events = []
     
-    # Mount MCP/SSE endpoint to FastAPI app
-    @app.post("/assist")
-    async def assist_endpoint(request: dict):
-        """MCP/SSE endpoint for Sentient Agent Framework compatibility."""
-        # This endpoint is handled by DefaultServer
-        # In production, you may want to integrate this more tightly
-        pass
+    async def emit_text_block(self, event_name: str, content: str):
+        event = f"event: {event_name}\ndata: {json.dumps({'content': content})}\n\n"
+        self.events.append(event)
     
-    print("[INFO] MCP/SSE server support enabled at /assist")
-except ImportError:
-    print("[WARNING] Sentient Agent Framework not installed. MCP/SSE endpoint disabled.")
-    _mcp_server = None
+    async def emit_json(self, event_name: str, data: dict):
+        event = f"event: {event_name}\ndata: {json.dumps(data)}\n\n"
+        self.events.append(event)
+    
+    def create_text_stream(self, event_name: str):
+        return SSEStream(event_name, self.events)
+    
+    async def complete(self):
+        event = f"event: done\ndata: {json.dumps({'status': 'complete'})}\n\n"
+        self.events.append(event)
+
+class SSEStream:
+    def __init__(self, name: str, events_list: list):
+        self.name = name
+        self.events_list = events_list
+    
+    async def emit_chunk(self, chunk: str):
+        event = f"event: {self.name}\ndata: {json.dumps({'chunk': chunk})}\n\n"
+        self.events_list.append(event)
+    
+    async def complete(self):
+        event = f"event: {self.name}_complete\ndata: {json.dumps({'status': 'complete'})}\n\n"
+        self.events_list.append(event)
+
+@app.post("/assist")
+async def assist_endpoint(request: dict):
+    """MCP/SSE endpoint for Sentient Agent Framework compatibility."""
+    
+    async def event_generator() -> AsyncGenerator[str, None]:
+        # Create SSE response handler
+        handler = SSEResponseHandler()
+        
+        # Create session and query from request
+        class SimpleSession:
+            def __init__(self, session_id: str):
+                self.id = session_id
+        
+        class SimpleQuery:
+            def __init__(self, prompt: str):
+                self.prompt = prompt
+        
+        session_id = request.get("session_id", "default-session")
+        query_data = request.get("query", {})
+        prompt = query_data.get("prompt", json.dumps(request))
+        
+        session = SimpleSession(session_id)
+        query = SimpleQuery(prompt)
+        
+        # Run the agent
+        try:
+            await _agent.assist(session, query, handler)
+        except Exception as e:
+            error_event = f"event: error\ndata: {json.dumps({'error': str(e)})}\n\n"
+            yield error_event
+            return
+        
+        # Yield all collected events
+        for event in handler.events:
+            yield event
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
+    )
 
 
 if __name__ == "__main__":
